@@ -5,8 +5,11 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
+
+import javax.ws.rs.core.Response;
 
 import static org.junit.Assert.assertEquals;
 
@@ -97,5 +100,57 @@ public class EndpointTest {
 
     //\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\
 
+    @Test
+    public void testLoginSuccess() {
+        User user = new User("test7@test.com", "Test", "12345");
+        ResponseEntity responseRegister = restTemplate.postForEntity("http://" + HOST + "/register", user, String.class);
+        assertEquals(Response.Status.CREATED.getStatusCode(), responseRegister.getStatusCode().value());
 
+        String response = restTemplate.postForObject("http://" + HOST + "/login", user, String.class);
+        assertEquals("Welcome Test!", response);
+    }
+
+    @Test(expected=HttpClientErrorException.class)
+    public void testLoginEmptyEmail() {
+        User user = new User("", "1234");
+        restTemplate.postForObject("http://" + HOST + "/login", user, String.class);
+    }
+
+    @Test(expected=HttpClientErrorException.class)
+    public void testLoginEmptyPassword() {
+        User user = new User("test@test.com", "");
+        restTemplate.postForObject("http://" + HOST + "/login", user, String.class);
+    }
+
+    @Test(expected=HttpClientErrorException.class)
+    public void testLoginNoEmail() {
+        User user = new User(null, "1234");
+        restTemplate.postForObject("http://" + HOST + "/login", user, String.class);
+    }
+
+    @Test(expected=HttpClientErrorException.class)
+    public void testLoginNoPassword() {
+        User user = new User("test@test.com", null);
+        restTemplate.postForObject("http://" + HOST + "/login", user, String.class);
+    }
+
+    @Test(expected=HttpClientErrorException.class)
+    public void testLoginWrongEmail() {
+        User user = new User("test.at", "1234");
+        restTemplate.postForObject("http://" + HOST + "/login", user, String.class);
+    }
+
+    @Test(expected=HttpClientErrorException.class)
+    public void testLoginWrongPassword() {
+        User user = new User("test@test.com", "54321");
+        restTemplate.postForObject("http://" + HOST + "/login", user, String.class);
+    }
+
+    @Test(expected=HttpClientErrorException.class)
+    public void testLoginNoEmailNoPassword() {
+        User user = new User(null, null);
+        restTemplate.postForObject("http://" + HOST + "/login", user, String.class);
+    }
+
+    //\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\
 }
