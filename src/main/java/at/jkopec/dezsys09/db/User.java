@@ -13,6 +13,7 @@ import javax.validation.constraints.Size;
 public class User {
     @Id
     @Size(max = 50)
+    @NotEmpty
     private String email;
 
     @Size(max = 50)
@@ -20,6 +21,7 @@ public class User {
     private String name;
 
     @NotEmpty
+    @Size(min = 5)
     private String password;
 
     public User() {
